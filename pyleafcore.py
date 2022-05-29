@@ -1,22 +1,24 @@
 from ctypes import *
 
-cleaf = cdll.LoadLibrary("libcleaf.so")
-
-cleaf.cleaf_init(17)
-
 class Leafcore():
 
 	def __init__(self):
-		self.obj = cleaf.cleafcore_new()
+        self.cleaf = cdll.LoadLibrary("libcleaf.so")
+        self.cleaf.cleaf_setLogLevel(0)
+        self.obj = self.cleaf.cleafcore_new()
+        
+    def setVerbosity(self, verbosity):
+        # Verbosity from 0 (normal) - 3 (ultraverbose)
+        self.cleaf.cleaf_setLogLevel(verbosity)
 
 	def __del__(self):
-		cleaf.cleafcore_delete(self.obj)
+		self.cleaf.cleafcore_delete(self.obj)
 
 	def setRootDir(self, rootDir):
-		cleaf.cleafconfig_setRootDir(bytes(rootDir, encoding='utf-8'))
+		self.cleaf.cleafconfig_setRootDir(bytes(rootDir, encoding='utf-8'))
 
 	def a_update(self):
-		cleaf.cleafcore_a_update(self.obj)
+		self.cleaf.cleafcore_a_update(self.obj)
 
 	def a_install(self, packages):
 		arr = (c_char_p * len(packages))()
@@ -26,7 +28,7 @@ class Leafcore():
 			c_str = (packages[i]).encode('utf-8')
 			arr[i] = c_char_p(c_str)
 
-		cleaf.cleafcore_readDefaultPackageList(self.obj)
-		cleaf.cleafcore_a_install(self.obj, len(packages), arr)
+		self.cleaf.cleafcore_readDefaultPackageList(self.obj)
+		self.cleaf.cleafcore_a_install(self.obj, len(packages), arr)
 
 
