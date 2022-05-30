@@ -1,15 +1,12 @@
 from ctypes import *
 
-# Get the cleaf api
-cleaf = cdll.LoadLibrary("libcleaf.so")
-
-# Initialize the cleaf api, only do this once
-# because it allocates a new Log module instance
-# Set the loglevel to LOGLEVEL_U
-cleaf.cleaf_init(2)
+cleaf_loaded = False
+cleaf = None
 
 class Leafcore():
     def __init__(self):
+        self.check_cleaf()
+
         # Create a new Leafcore instance
         self.leafcore = cleaf.cleafcore_new()
 
@@ -36,3 +33,15 @@ class Leafcore():
 
         cleaf.cleafcore_readDefaultPackageList(self.leafcore)
         cleaf.cleafcore_a_install(self.leafcore, len(packages), arr)
+
+    def check_cleaf(self):
+        global cleaf_loaded
+        global cleaf
+        
+        if (not cleaf_loaded):
+            cleaf = cdll.LoadLibrary("libcleaf.so")
+            cleaf_loaded = True
+            # Initialize the cleaf api, only do this once
+            # because it allocates a new Log module instance
+            # Set the loglevel to LOGLEVEL_U
+            cleaf.cleaf_init(2)
