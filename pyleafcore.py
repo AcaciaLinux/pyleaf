@@ -1,27 +1,30 @@
 from ctypes import *
 
+# Get the cleaf api
+cleaf = cdll.LoadLibrary("libcleaf.so")
+
+# Initialize the cleaf api, only do this once
+# because it allocates a new Log module instance
+# Set the loglevel to LOGLEVEL_U
+cleaf.cleaf_init(2)
+
 class Leafcore():
     def __init__(self):
-        self.cleaf = cdll.LoadLibrary("libcleaf.so")
-        
-        # init arg is Verbosity?
-        self.cleaf.cleaf_init(0)
-        
-        self.leafcore = self.cleaf.cleafcore_new()
-
+        # Create a new Leafcore instance
+        self.leafcore = cleaf.cleafcore_new()
 
     def setVerbosity(self, verbosity):
         # Verbosity from 0 (normal) - 3 (ultraverbose)
-        self.cleaf.cleaf_setLogLevel(verbosity)
+        cleaf.cleaf_setLogLevel(verbosity)
 
     def __del__(self):
-	    self.cleaf.cleafcore_delete(self.leafcore)
+	    cleaf.cleafcore_delete(self.leafcore)
 
     def setRootDir(self, rootDir):
-        self.cleaf.cleafconfig_setRootDir(bytes(rootDir, encoding='utf-8'))
+        cleaf.cleafconfig_setRootDir(bytes(rootDir, encoding='utf-8'))
 
     def a_update(self):
-	    self.cleaf.cleafcore_a_update(self.leafcore)
+	    cleaf.cleafcore_a_update(self.leafcore)
 
     def a_install(self, packages):
         arr = (c_char_p * len(packages))()
@@ -31,7 +34,5 @@ class Leafcore():
             c_str = (packages[i]).encode('utf-8')
             arr[i] = c_char_p(c_str)
 
-        self.cleaf.cleafcore_readDefaultPackageList(self.leafcore)
-        self.cleaf.cleafcore_a_install(self.leafcore, len(packages), arr)
-
-
+        cleaf.cleafcore_readDefaultPackageList(self.leafcore)
+        cleaf.cleafcore_a_install(self.leafcore, len(packages), arr)
