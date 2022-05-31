@@ -1,32 +1,47 @@
 from ctypes import *
 
-cleaf = cdll.LoadLibrary("libcleaf.so")
-
-cleaf.cleaf_init(17)
+cleaf_loaded = False
+cleaf = None
 
 class Leafcore():
+    def __init__(self):
+        self.check_cleaf()
 
-	def __init__(self):
-		self.obj = cleaf.cleafcore_new()
+        # Create a new Leafcore instance
+        self.leafcore = cleaf.cleafcore_new()
 
-	def __del__(self):
-		cleaf.cleafcore_delete(self.obj)
+    def setVerbosity(self, verbosity):
+        # Verbosity from 0 (normal) - 3 (ultraverbose)
+        cleaf.cleaf_setLogLevel(verbosity)
 
-	def setRootDir(self, rootDir):
-		cleaf.cleafconfig_setRootDir(bytes(rootDir, encoding='utf-8'))
+    def __del__(self):
+	    cleaf.cleafcore_delete(self.leafcore)
 
-	def a_update(self):
-		cleaf.cleafcore_a_update(self.obj)
+    def setRootDir(self, rootDir):
+        cleaf.cleafconfig_setRootDir(bytes(rootDir, encoding='utf-8'))
 
-	def a_install(self, packages):
-		arr = (c_char_p * len(packages))()
+    def a_update(self):
+	    cleaf.cleafcore_a_update(self.leafcore)
 
-		for i in range(0, len(packages)):
-			print("Adding argument " + str(i) + ": " + packages[i])
-			c_str = (packages[i]).encode('utf-8')
-			arr[i] = c_char_p(c_str)
+    def a_install(self, packages):
+        arr = (c_char_p * len(packages))()
 
-		cleaf.cleafcore_readDefaultPackageList(self.obj)
-		cleaf.cleafcore_a_install(self.obj, len(packages), arr)
+        for i in range(0, len(packages)):
+            print("Adding argument " + str(i) + ": " + packages[i])
+            c_str = (packages[i]).encode('utf-8')
+            arr[i] = c_char_p(c_str)
 
+        cleaf.cleafcore_readDefaultPackageList(self.leafcore)
+        cleaf.cleafcore_a_install(self.leafcore, len(packages), arr)
 
+    def check_cleaf(self):
+        global cleaf_loaded
+        global cleaf
+        
+        if (not cleaf_loaded):
+            cleaf = cdll.LoadLibrary("libcleaf.so")
+            cleaf_loaded = True
+            # Initialize the cleaf api, only do this once
+            # because it allocates a new Log module instance
+            # Set the loglevel to LOGLEVEL_U
+            cleaf.cleaf_init(2)
