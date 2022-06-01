@@ -32,6 +32,7 @@ class Leafcore():
             arr[i] = c_char_p(c_str)
 
         cleaf.cleafcore_readDefaultPackageList(self.leafcore)
+        cleaf.cleafcore_parseInstalled(self.leafcore)
         cleaf.cleafcore_a_install(self.leafcore, len(packages), arr)
 
     def check_cleaf(self):
