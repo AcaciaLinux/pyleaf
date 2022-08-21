@@ -1,7 +1,28 @@
 from ctypes import *
+from enum import Enum
 
 cleaf_loaded = False
 cleaf = None
+
+class LeafConfig_redownload(Enum):
+    REDOWNLOAD_NONE = 0
+    REDOWNLOAD_SPECIFIED = 1
+    REDOWNLOAD_ALL = 2
+
+class LeafConfig_bool(Enum):
+    CONFIG_NOASK = 0
+    CONFIG_FORCEOVERWRITE = 1
+    CONFIG_RUNPREINSTALL = 2
+    CONFIG_RUNPOSTINSTALL = 3
+
+class LeafConfig_string(Enum):
+    CONFIG_ROOTDIR = 0
+    CONFIG_CACHEDIR = 1
+    CONFIG_DOWNLOADDIR = 2
+    CONFIG_PACKAGESDIR = 3
+    CONFIG_CONFIGDIR = 4
+    CONFIG_INSTALLEDDIR = 5
+    CONFIG_PKGLISTPATH = 6
 
 class Leafcore():
     def __init__(self):
@@ -15,13 +36,22 @@ class Leafcore():
         cleaf.cleaf_setLogLevel(verbosity)
 
     def __del__(self):
-	    cleaf.cleafcore_delete(self.leafcore)
+        cleaf.cleafcore_delete(self.leafcore)
 
     def setRootDir(self, rootDir):
         cleaf.cleafconfig_setRootDir(bytes(rootDir, encoding='utf-8'))
 
+    def setRedownload(self, redownload: LeafConfig_redownload):
+        cleaf.cleafconfig_setRedownload(redownload)
+
+    def setBoolConfig(self, config: LeafConfig_bool, value: bool):
+        cleaf.cleafconfig_setBoolConfig(config, value)
+
+    def getBoolConfig(self, config: LeafConfig_bool):
+        return cleaf.cleafconfig_getBoolConfig(config)
+
     def a_update(self):
-	    cleaf.cleafcore_a_update(self.leafcore)
+        cleaf.cleafcore_a_update(self.leafcore)
 
     def a_install(self, packages):
         arr = (c_char_p * len(packages))()
