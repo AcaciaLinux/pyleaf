@@ -45,7 +45,11 @@ class Leafcore():
         cleaf.cleafconfig_setRedownload(redownload)
 
     def setBoolConfig(self, config: LeafConfig_bool, value: bool):
-        cleaf.cleafconfig_setBoolConfig(config, value)
+        val = 0
+        if value:
+            val = 1
+        
+        cleaf.cleafconfig_setBoolConfig(config.value, val)
 
     def getBoolConfig(self, config: LeafConfig_bool):
         return cleaf.cleafconfig_getBoolConfig(config)
