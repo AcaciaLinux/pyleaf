@@ -30,6 +30,7 @@ class Leafcore():
 
         # Create a new Leafcore instance
         self.leafcore = cleaf.cleafcore_new()
+        self.leafconfig = cleaf.cleafcore_getConfig(self.leafcore)
 
     def setVerbosity(self, verbosity):
         # Verbosity from 0 (normal) - 3 (ultraverbose)
@@ -39,20 +40,20 @@ class Leafcore():
         cleaf.cleafcore_delete(self.leafcore)
 
     def setRootDir(self, rootDir):
-        cleaf.cleafconfig_setRootDir(bytes(rootDir, encoding='utf-8'))
+        cleaf.cleafconfig_setRootDir(self.leafconfig, bytes(rootDir, encoding='utf-8'))
 
     def setRedownload(self, redownload: LeafConfig_redownload):
-        cleaf.cleafconfig_setRedownload(redownload)
+        cleaf.cleafconfig_setRedownload(self.leafconfig, redownload)
 
     def setBoolConfig(self, config: LeafConfig_bool, value: bool):
         val = 0
         if value:
             val = 1
         
-        cleaf.cleafconfig_setBoolConfig(config.value, val)
+        cleaf.cleafconfig_setBoolConfig(self.leafconfig, config.value, val)
 
     def getBoolConfig(self, config: LeafConfig_bool):
-        return cleaf.cleafconfig_getBoolConfig(config)
+        return cleaf.cleafconfig_getBoolConfig(self.leafconfig, config)
 
     def a_update(self):
         cleaf.cleafcore_a_update(self.leafcore)

@@ -6,5 +6,5 @@ leafcore = Leafcore()
 leafcore.setRootDir("./root")
 leafcore.a_update()
 
-packages = ["base"]
+packages = ["crosstools"]
 leafcore.a_install(packages)
