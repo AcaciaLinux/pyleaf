@@ -7,4 +7,7 @@ leafcore.setRootDir("./root")
 leafcore.a_update()
 
 packages = ["crosstools"]
-leafcore.a_install(packages)
+res = leafcore.a_install(packages)
+
+if (res != 0):
+	print("Leafcore error code: {}".format(res))
