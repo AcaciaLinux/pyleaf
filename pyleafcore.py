@@ -56,7 +56,7 @@ class Leafcore():
         return cleaf.cleafconfig_getBoolConfig(self.leafconfig, config)
 
     def a_update(self):
-        cleaf.cleafcore_a_update(self.leafcore)
+        return cleaf.cleafcore_a_update(self.leafcore)
 
     def a_install(self, packages):
         arr = (c_char_p * len(packages))()
@@ -66,9 +66,15 @@ class Leafcore():
             c_str = (packages[i]).encode('utf-8')
             arr[i] = c_char_p(c_str)
 
-        cleaf.cleafcore_readDefaultPackageList(self.leafcore)
-        cleaf.cleafcore_parseInstalled(self.leafcore)
-        cleaf.cleafcore_a_install(self.leafcore, len(packages), arr)
+        res = cleaf.cleafcore_readDefaultPackageList(self.leafcore)
+        if (res != 0):
+            return res
+        
+        res = cleaf.cleafcore_parseInstalled(self.leafcore)
+        if (res != 0):
+            return res
+            
+        return cleaf.cleafcore_a_install(self.leafcore, len(packages), arr)
 
     def check_cleaf(self):
         global cleaf_loaded
