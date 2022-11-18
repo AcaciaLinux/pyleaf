@@ -29,6 +29,7 @@ class Leafcore():
         self.check_cleaf()
 
         # Create a new Leafcore instance
+        cleaf.cleafcore_new.restype = c_void_p
         self.leafcore = cleaf.cleafcore_new()
 
     def setVerbosity(self, verbosity):
@@ -36,12 +37,15 @@ class Leafcore():
         cleaf.cleaf_setLogLevel(verbosity)
 
     def __del__(self):
+        cleaf.cleafcore_delete.argtypes = [c_void_p]
         cleaf.cleafcore_delete(self.leafcore)
 
     def setRootDir(self, rootDir):
+        cleaf.cleafconfig_setRootDir.argtypes = [c_void_p, c_char_p]
         cleaf.cleafconfig_setRootDir(self.leafcore, bytes(rootDir, encoding='utf-8'))
 
     def setRedownload(self, redownload: LeafConfig_redownload):
+        cleaf.cleafconfig_setRedownload.argtypes = [c_void_p, c_uint]
         cleaf.cleafconfig_setRedownload(self.leafcore, redownload)
 
     def setBoolConfig(self, config: LeafConfig_bool, value: bool):
@@ -49,12 +53,17 @@ class Leafcore():
         if value:
             val = 1
         
+        cleaf.cleafconfig_setBoolConfig.argtypes = [c_void_p, c_uint, c_int]
         cleaf.cleafconfig_setBoolConfig(self.leafcore, config.value, val)
 
     def getBoolConfig(self, config: LeafConfig_bool):
+        cleaf.cleafconfig_getBoolConfig.restype = c_int
+        cleaf.cleafconfig_getBoolConfig.argtypes = [c_void_p, c_uint]
         return cleaf.cleafconfig_getBoolConfig(self.leafcore, config)
 
     def a_update(self):
+        cleaf.cleafcore_a_update.restype = c_int
+        cleaf.cleafcore_a_update.argtypes = [c_void_p]
         return cleaf.cleafcore_a_update(self.leafcore)
 
     def a_install(self, packages):
@@ -65,14 +74,20 @@ class Leafcore():
             c_str = (packages[i]).encode('utf-8')
             arr[i] = c_char_p(c_str)
 
+        cleaf.cleafcore_readDefaultPackageList.restype = c_int
+        cleaf.cleafcore_readDefaultPackageList.argtypes = [c_void_p]
         res = cleaf.cleafcore_readDefaultPackageList(self.leafcore)
         if (res != 0):
             return res
         
+        cleaf.cleafcore_parseInstalled.restype = c_int
+        cleaf.cleafcore_parseInstalled.argtypes = [c_void_p]
         res = cleaf.cleafcore_parseInstalled(self.leafcore)
         if (res != 0):
             return res
-            
+
+        cleaf.cleafcore_a_install.restype = c_int
+        cleaf.cleafcore_a_install.argtypes = [c_void_p, c_int, (c_char_p * len(packages))]
         return cleaf.cleafcore_a_install(self.leafcore, len(packages), arr)
 
     def check_cleaf(self):
@@ -85,4 +100,5 @@ class Leafcore():
             # Initialize the cleaf api, only do this once
             # because it allocates a new Log module instance
             # Set the loglevel to LOGLEVEL_U
+            cleaf.cleaf_init.argtypes = [c_uint]
             cleaf.cleaf_init(2)
