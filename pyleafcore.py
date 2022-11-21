@@ -89,6 +89,30 @@ class Leafcore():
         cleaf.cleafcore_a_install.restype = c_int
         cleaf.cleafcore_a_install.argtypes = [c_void_p, c_int, (c_char_p * len(packages))]
         return cleaf.cleafcore_a_install(self.leafcore, len(packages), arr)
+    
+    def a_upgrade(self, packages):
+        arr = (c_char_p * len(packages))()
+
+        for i in range(0, len(packages)):
+            print("Adding argument " + str(i) + ": " + packages[i])
+            c_str = (packages[i]).encode('utf-8')
+            arr[i] = c_char_p(c_str)
+
+        cleaf.cleafcore_readDefaultPackageList.restype = c_int
+        cleaf.cleafcore_readDefaultPackageList.argtypes = [c_void_p]
+        res = cleaf.cleafcore_readDefaultPackageList(self.leafcore)
+        if (res != 0):
+            return res
+        
+        cleaf.cleafcore_parseInstalled.restype = c_int
+        cleaf.cleafcore_parseInstalled.argtypes = [c_void_p]
+        res = cleaf.cleafcore_parseInstalled(self.leafcore)
+        if (res != 0):
+            return res
+
+        cleaf.cleafcore_a_upgrade.restype = c_int
+        cleaf.cleafcore_a_upgrade.argtypes = [c_void_p, c_int, (c_char_p * len(packages))]
+        return cleaf.cleafcore_a_upgrade(self.leafcore, len(packages), arr)
 
     def check_cleaf(self):
         global cleaf_loaded

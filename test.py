@@ -14,3 +14,9 @@ res = leafcore.a_install(packages)
 
 if (res != 0):
 	print("Leafcore error code: {}".format(res))
+ 
+Upackages = []
+res = leafcore.a_upgrade(Upackages)
+
+if (res != 0):
+	print("Leafcore error code: {}".format(res))
