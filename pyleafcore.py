@@ -3,6 +3,7 @@ from enum import Enum
 
 cleaf_loaded = False
 cleaf = None
+cleaf_ec_feature_missing = 0
 
 class LeafConfig_redownload(Enum):
     REDOWNLOAD_NONE = 0
@@ -117,6 +118,7 @@ class Leafcore():
     def check_cleaf(self):
         global cleaf_loaded
         global cleaf
+        global cleaf_ec_feature_missing
         
         if (not cleaf_loaded):
             cleaf = cdll.LoadLibrary("libcleaf.so")
@@ -126,3 +128,7 @@ class Leafcore():
             # Set the loglevel to LOGLEVEL_U
             cleaf.cleaf_init.argtypes = [c_uint]
             cleaf.cleaf_init(2)
+            
+            cleaf.get_ec_feature_missing.restype = c_int
+            cleaf_ec_feature_missing = cleaf.get_ec_feature_missing()
+            print("Cleaf error code for missing feature is {}".format(cleaf_ec_feature_missing))
