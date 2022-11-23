@@ -20,3 +20,7 @@ res = leafcore.a_upgrade(Upackages)
 
 if (res != 0):
 	print("Leafcore error code: {}".format(res))
+
+print("")
+print("----- LEAF DEBUG LOG -----")
+print(leafcore.get_log())
