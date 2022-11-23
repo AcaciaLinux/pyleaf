@@ -132,3 +132,21 @@ class Leafcore():
             cleaf.get_ec_feature_missing.restype = c_int
             cleaf_ec_feature_missing = cleaf.get_ec_feature_missing()
             print("Cleaf error code for missing feature is {}".format(cleaf_ec_feature_missing))
+            
+    def get_log(self):
+        cleaf.cleaf_get_log.restype = c_void_p
+        resP = cleaf.cleaf_get_log()
+        log = c_char_p(resP)
+        
+        if (resP == 0):
+            return "[pyleaf] FAILED TO RETRIEVE LOG"
+        
+        string = str(log.value.decode('utf-8'))
+        
+        cleaf.cleaf_delete_log.argtypes = [c_void_p]
+        cleaf.cleaf_delete_log(resP)
+        
+        return string
+    
+    def clear_log(self):
+        cleaf.cleaf_clear_log()
