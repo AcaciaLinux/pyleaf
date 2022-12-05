@@ -8,6 +8,7 @@ leafcore = Leafcore()
 leafcore.setRootDir("./root")
 leafcore.setBoolConfig(LeafConfig_bool.CONFIG_NOASK, True)
 leafcore.setBoolConfig(LeafConfig_bool.CONFIG_NOPROGRESS, True)
+leafcore.setBoolConfig(LeafConfig_bool.CONFIG_FORCE, False)
 leafcore.a_update()
 
 packages = ["base"]

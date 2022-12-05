@@ -16,6 +16,7 @@ class LeafConfig_bool(Enum):
     CONFIG_RUNPREINSTALL = 2
     CONFIG_RUNPOSTINSTALL = 3
     CONFIG_NOPROGRESS = 4
+    CONFIG_FORCE = 5
 
 class LeafConfig_string(Enum):
     CONFIG_ROOTDIR = 0
