@@ -26,6 +26,7 @@ class LeafConfig_string(Enum):
     CONFIG_CONFIGDIR = 4
     CONFIG_INSTALLEDDIR = 5
     CONFIG_PKGLISTPATH = 6
+    CONFIG_PKGLISTURL = 7
 
 class Leafcore():
     def __init__(self):
@@ -62,7 +63,12 @@ class Leafcore():
     def getBoolConfig(self, config: LeafConfig_bool):
         cleaf.cleafconfig_getBoolConfig.restype = c_int
         cleaf.cleafconfig_getBoolConfig.argtypes = [c_void_p, c_uint]
-        return cleaf.cleafconfig_getBoolConfig(self.leafcore, config)
+        return cleaf.cleafconfig_getBoolConfig(self.leafcore, config.value)
+
+    def setStringConfig(self, config: LeafConfig_string, option: str):
+        cleaf.cleafconfig_setStringConfig.restype = c_int
+        cleaf.cleafconfig_setStringConfig.argtypes = [c_void_p, c_uint, c_char_p]
+        cleaf.cleafconfig_setStringConfig(self.leafcore, config.value, bytes(option, encoding='utf-8'))
 
     def a_update(self):
         cleaf.cleafcore_a_update.restype = c_int
@@ -75,7 +81,8 @@ class Leafcore():
         for i in range(0, len(packages)):
             print("Adding argument " + str(i) + ": " + packages[i])
             c_str = (packages[i]).encode('utf-8')
-            arr[i] = c_char_p(c_str)
+            arr[i] = create_string_buffer(c_str).raw
+            #arr[i] = c_char_p(c_str)
 
         cleaf.cleafcore_readDefaultPackageList.restype = c_int
         cleaf.cleafcore_readDefaultPackageList.argtypes = [c_void_p]
