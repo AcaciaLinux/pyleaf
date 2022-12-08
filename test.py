@@ -9,9 +9,10 @@ leafcore.setRootDir("./root")
 leafcore.setBoolConfig(LeafConfig_bool.CONFIG_NOASK, True)
 leafcore.setBoolConfig(LeafConfig_bool.CONFIG_NOPROGRESS, True)
 leafcore.setBoolConfig(LeafConfig_bool.CONFIG_FORCE, False)
+leafcore.setStringConfig(LeafConfig_string.CONFIG_PKGLISTURL, "https://acpi.acacialinux.org/?get=packagelist");
 leafcore.a_update()
 
-packages = ["base"]
+packages = ["glibc", "readline", "ncurses"]
 res = leafcore.a_install(packages)
 
 if (res != 0):
