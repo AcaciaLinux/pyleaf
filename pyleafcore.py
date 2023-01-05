@@ -17,6 +17,7 @@ class LeafConfig_bool(Enum):
     CONFIG_RUNPOSTINSTALL = 3
     CONFIG_NOPROGRESS = 4
     CONFIG_FORCE = 5
+    CONFIG_CHECKREMOTEHASHES = 6
 
 class LeafConfig_string(Enum):
     CONFIG_ROOTDIR = 0
