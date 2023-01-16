@@ -42,8 +42,9 @@ class Leafcore():
         cleaf.cleaf_setLogLevel(verbosity)
 
     def __del__(self):
-        cleaf.cleafcore_delete.argtypes = [c_void_p]
-        cleaf.cleafcore_delete(self.leafcore)
+        if(not cleaf is None):
+            cleaf.cleafcore_delete.argtypes = [c_void_p]
+            cleaf.cleafcore_delete(self.leafcore)
 
     def setRootDir(self, rootDir):
         cleaf.cleafconfig_setRootDir.argtypes = [c_void_p, c_char_p]
