@@ -9,7 +9,8 @@ leafcore.setStringConfig(LeafConfig_string.CONFIG_ROOTDIR, "./root")
 leafcore.setBoolConfig(LeafConfig_bool.CONFIG_NOASK, True)
 leafcore.setBoolConfig(LeafConfig_bool.CONFIG_NOPROGRESS, True)
 leafcore.setBoolConfig(LeafConfig_bool.CONFIG_FORCE, False)
-leafcore.setStringConfig(LeafConfig_string.CONFIG_PKGLISTURL, "https://api.acacialinux.org/?get=packagelist");
+leafcore.setStringConfig(LeafConfig_string.CONFIG_PKGLISTURL, "https://api.acacialinux.org/?get=packagelist")
+leafcore.setStringConfig(LeafConfig_string.CONFIG_DOWNLOADCACHE, "./leafcache/")
 if (not leafcore.a_update() == 0):
 	print("Failed to get package list (code {}): {}".format(leafcore.getLastErrorCode(), leafcore.getLastErrorString()))
 	exit(-1)
