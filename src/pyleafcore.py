@@ -51,6 +51,9 @@ class Leafcore():
             cleaf.cleafcore_delete.argtypes = [c_void_p]
             cleaf.cleafcore_delete(self.leafcore)
 
+    def abort(self):
+        cleaf.cleaf_abort()
+
     def setRedownload(self, redownload: LeafConfig_redownload):
         cleaf.cleafconfig_setRedownload.argtypes = [c_void_p, c_uint]
         cleaf.cleafconfig_setRedownload(self.leafcore, redownload)
