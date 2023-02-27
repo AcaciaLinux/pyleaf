@@ -32,6 +32,7 @@ class LeafConfig_string(Enum):
     CONFIG_PKGLISTPATH = 8
     CONFIG_CHROOTCMD = 9
     CONFIG_RUNSCRIPTSDIR = 10
+    CONFIG_DOWNLOADCACHE = 11
 
 class Leafcore():
     def __init__(self):
