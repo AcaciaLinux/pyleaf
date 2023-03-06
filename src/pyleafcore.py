@@ -34,6 +34,19 @@ class LeafConfig_string(Enum):
     CONFIG_RUNSCRIPTSDIR = 10
     CONFIG_DOWNLOADCACHE = 11
 
+class LeafException(Exception):
+
+    # The leaf internal error code
+    code: int
+
+    # The error message in readable format
+    message: str
+
+    def __init__(self, code: int, message: str):
+        print("New LeafException: code = {}, message = '{}'".format(code, message))
+        self.code = code
+        self.message = message
+
 class Leafcore():
     def __init__(self):
         self.check_cleaf()
