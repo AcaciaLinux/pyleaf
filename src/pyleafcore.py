@@ -4,6 +4,8 @@ from enum import Enum
 cleaf_loaded = False
 cleaf = None
 
+CLEAF_LEAFERROR = -3
+
 class LeafConfig_redownload(Enum):
     REDOWNLOAD_NONE = 0
     REDOWNLOAD_SPECIFIED = 1
@@ -107,7 +109,9 @@ class Leafcore():
     def a_update(self):
         cleaf.cleafcore_a_update.restype = c_int
         cleaf.cleafcore_a_update.argtypes = [c_void_p]
-        return cleaf.cleafcore_a_update(self.leafcore)
+        res = cleaf.cleafcore_a_update(self.leafcore)
+        if (res == CLEAF_LEAFERROR):
+            raise LeafException(self.getLastErrorCode(), self.getLastErrorString())
 
     def a_install(self, packages):
         arr = (c_char_p * len(packages))()
@@ -118,7 +122,9 @@ class Leafcore():
 
         cleaf.cleafcore_a_install.restype = c_int
         cleaf.cleafcore_a_install.argtypes = [c_void_p, c_uint, (c_char_p * len(packages))]
-        return cleaf.cleafcore_a_install(self.leafcore, len(packages), arr)
+        res = cleaf.cleafcore_a_install(self.leafcore, len(packages), arr)
+        if (res == CLEAF_LEAFERROR):
+            raise LeafException(self.getLastErrorCode(), self.getLastErrorString())
 
     def a_installLocal(self, packages):
         arr = (c_char_p * len(packages))()
@@ -129,7 +135,9 @@ class Leafcore():
 
         cleaf.cleafcore_a_installLocal.restype = c_int
         cleaf.cleafcore_a_installLocal.argtypes = [c_void_p, c_uint, (c_char_p * len(packages))]
-        return cleaf.cleafcore_a_installLocal(self.leafcore, len(packages), arr)
+        res = cleaf.cleafcore_a_installLocal(self.leafcore, len(packages), arr)
+        if (res == CLEAF_LEAFERROR):
+            raise LeafException(self.getLastErrorCode(), self.getLastErrorString())
     
     def a_upgrade(self, packages):
         arr = (c_char_p * len(packages))()
@@ -141,7 +149,9 @@ class Leafcore():
 
         cleaf.cleafcore_a_upgrade.restype = c_int
         cleaf.cleafcore_a_upgrade.argtypes = [c_void_p, c_int, (c_char_p * len(packages))]
-        return cleaf.cleafcore_a_upgrade(self.leafcore, len(packages), arr)
+        res = cleaf.cleafcore_a_upgrade(self.leafcore, len(packages), arr)
+        if (res == CLEAF_LEAFERROR):
+            raise LeafException(self.getLastErrorCode(), self.getLastErrorString())
 
     def a_remove(self, packages):
         arr = (c_char_p * len(packages))()
@@ -152,7 +162,9 @@ class Leafcore():
 
         cleaf.cleafcore_a_remove.restype = c_int
         cleaf.cleafcore_a_remove.argtypes = [c_void_p, c_uint, (c_char_p * len(packages))]
-        return cleaf.cleafcore_a_remove(self.leafcore, len(packages), arr)
+        res = cleaf.cleafcore_a_remove(self.leafcore, len(packages), arr)
+        if (res == CLEAF_LEAFERROR):
+            raise LeafException(self.getLastErrorCode(), self.getLastErrorString())
 
     def check_cleaf(self):
         global cleaf_loaded
