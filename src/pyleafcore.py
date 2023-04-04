@@ -4,6 +4,9 @@ from enum import Enum
 cleaf_loaded = False
 cleaf = None
 
+libc_loaded = False
+libc = None
+
 CLEAF_LEAFERROR = -3
 
 class LeafConfig_redownload(Enum):
@@ -51,7 +54,8 @@ class LeafException(Exception):
 
 class Leafcore():
     def __init__(self):
-        self.check_cleaf()
+        Leafcore.check_cleaf()
+        Leafcore.check_libc()
 
         # Create a new Leafcore instance
         cleaf.cleafcore_new.restype = c_void_p
@@ -166,19 +170,6 @@ class Leafcore():
         if (res == CLEAF_LEAFERROR):
             raise LeafException(self.getLastErrorCode(), self.getLastErrorString())
 
-    def check_cleaf(self):
-        global cleaf_loaded
-        global cleaf
-
-        if (not cleaf_loaded):
-            cleaf = cdll.LoadLibrary("libcleaf.so")
-            cleaf_loaded = True
-            # Initialize the cleaf api, only do this once
-            # because it allocates a new Log module instance
-            # Set the loglevel to LOGLEVEL_U
-            cleaf.cleaf_init.argtypes = [c_uint]
-            cleaf.cleaf_init(3)
-
     def getLastErrorCode(self):
         cleaf.cleafcore_getError.restype = c_uint16
         cleaf.cleafcore_getError.argtypes = [c_void_p]
@@ -195,7 +186,7 @@ class Leafcore():
 
         string = str(log.value.decode('utf-8'))
 
-        #TODO: free memory
+        Leafcore.libc_free(log)
 
         return string
 
@@ -209,9 +200,40 @@ class Leafcore():
 
         string = str(log.value.decode('utf-8'))
 
-        #TODO: free memory
+        Leafcore.libc_free(log)
 
         return string
 
     def clear_log(self):
         cleaf.cleaf_clear_log()
+
+    def check_cleaf():
+        global cleaf_loaded
+        global cleaf
+
+        if (not cleaf_loaded):
+            cleaf = cdll.LoadLibrary("libcleaf.so")
+            cleaf_loaded = True
+            # Initialize the cleaf api, only do this once
+            # because it allocates a new Log module instance
+            # Set the loglevel to LOGLEVEL_U
+            cleaf.cleaf_init.argtypes = [c_uint]
+            cleaf.cleaf_init(3)
+
+    def check_libc():
+        global libc_loaded
+        global libc
+
+        if (not libc_loaded):
+            libc = cdll.LoadLibrary("libc.so.6")
+            libc_loaded = True
+
+    def libc_free(obj):
+        global libc_loaded
+        global libc
+
+        # Ensure that libc is loaded
+        Leafcore.check_libc()
+
+        libc.free.argtypes = [c_void_p]
+        libc.free(obj)
