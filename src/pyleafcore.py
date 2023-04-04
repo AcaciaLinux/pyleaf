@@ -7,6 +7,9 @@ cleaf = None
 libc_loaded = False
 libc = None
 
+CLEAFCORE_OK = 0
+CLEAFCORE_NOTINIT = -1
+CLEAFCORE_NOCORE = -2
 CLEAF_LEAFERROR = -3
 
 class LeafConfig_redownload(Enum):
@@ -51,6 +54,23 @@ class LeafException(Exception):
         print("New LeafException: code = {}, message = '{}'".format(code, message))
         self.code = code
         self.message = message
+
+# A wrapper to wrap the cleafcore_* calls and handle their response codes
+def cleaf_leafcore(func):
+    def wrapper(self, *args, **kwargs):
+        res = func(self, *args, **kwargs)
+
+        if (res == CLEAFCORE_NOTINIT):
+            raise LeafException(max(int)-1, "[pyleaf] The cleaf runtime does not seem to be initialized")
+
+        if (res == CLEAFCORE_NOCORE):
+            raise LeafException(max(int)-2, "[pyleaf] There seems to be no leafcore available")
+
+        if (res == CLEAF_LEAFERROR):
+            raise LeafException(self.getLastErrorCode(), self.getLastErrorString())
+
+        return res
+    return wrapper
 
 class Leafcore():
     def __init__(self):
@@ -110,13 +130,13 @@ class Leafcore():
 
         return string
 
+    @cleaf_leafcore
     def a_update(self):
         cleaf.cleafcore_a_update.restype = c_int
         cleaf.cleafcore_a_update.argtypes = [c_void_p]
-        res = cleaf.cleafcore_a_update(self.leafcore)
-        if (res == CLEAF_LEAFERROR):
-            raise LeafException(self.getLastErrorCode(), self.getLastErrorString())
+        return cleaf.cleafcore_a_update(self.leafcore)
 
+    @cleaf_leafcore
     def a_install(self, packages):
         arr = (c_char_p * len(packages))()
 
@@ -126,10 +146,9 @@ class Leafcore():
 
         cleaf.cleafcore_a_install.restype = c_int
         cleaf.cleafcore_a_install.argtypes = [c_void_p, c_uint, (c_char_p * len(packages))]
-        res = cleaf.cleafcore_a_install(self.leafcore, len(packages), arr)
-        if (res == CLEAF_LEAFERROR):
-            raise LeafException(self.getLastErrorCode(), self.getLastErrorString())
+        return cleaf.cleafcore_a_install(self.leafcore, len(packages), arr)
 
+    @cleaf_leafcore
     def a_installLocal(self, packages):
         arr = (c_char_p * len(packages))()
 
@@ -139,10 +158,9 @@ class Leafcore():
 
         cleaf.cleafcore_a_installLocal.restype = c_int
         cleaf.cleafcore_a_installLocal.argtypes = [c_void_p, c_uint, (c_char_p * len(packages))]
-        res = cleaf.cleafcore_a_installLocal(self.leafcore, len(packages), arr)
-        if (res == CLEAF_LEAFERROR):
-            raise LeafException(self.getLastErrorCode(), self.getLastErrorString())
-    
+        return cleaf.cleafcore_a_installLocal(self.leafcore, len(packages), arr)
+
+    @cleaf_leafcore
     def a_upgrade(self, packages):
         arr = (c_char_p * len(packages))()
 
@@ -153,10 +171,9 @@ class Leafcore():
 
         cleaf.cleafcore_a_upgrade.restype = c_int
         cleaf.cleafcore_a_upgrade.argtypes = [c_void_p, c_int, (c_char_p * len(packages))]
-        res = cleaf.cleafcore_a_upgrade(self.leafcore, len(packages), arr)
-        if (res == CLEAF_LEAFERROR):
-            raise LeafException(self.getLastErrorCode(), self.getLastErrorString())
+        return cleaf.cleafcore_a_upgrade(self.leafcore, len(packages), arr)
 
+    @cleaf_leafcore
     def a_remove(self, packages):
         arr = (c_char_p * len(packages))()
 
@@ -166,9 +183,7 @@ class Leafcore():
 
         cleaf.cleafcore_a_remove.restype = c_int
         cleaf.cleafcore_a_remove.argtypes = [c_void_p, c_uint, (c_char_p * len(packages))]
-        res = cleaf.cleafcore_a_remove(self.leafcore, len(packages), arr)
-        if (res == CLEAF_LEAFERROR):
-            raise LeafException(self.getLastErrorCode(), self.getLastErrorString())
+        return cleaf.cleafcore_a_remove(self.leafcore, len(packages), arr)
 
     def getLastErrorCode(self):
         cleaf.cleafcore_getError.restype = c_uint16
